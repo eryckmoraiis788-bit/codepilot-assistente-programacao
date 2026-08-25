@@ -20,3 +20,6 @@
 - [x] Analisar a configuração de compilação iOS do repositório GitHub iOS App
 - [x] Adaptar a configuração de compilação ao CodePilot e preparar um repositório privado dedicado
 - [ ] Validar a estrutura de distribuição iOS e orientar a geração da IPA
+- [x] Diagnosticar a falha inicial do GitHub Actions na compilação da IPA
+- [ ] Regularizar a disponibilidade do GitHub Actions e executar novamente a compilação da IPA
+- [ ] Verificar segredos e alterar o repositório do CodePilot para público antes da nova compilação
