@@ -1,0 +1,81 @@
+name: Build CodePilot IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-ios:
+    name: Build unsigned iOS IPA for SideStore
+    runs-on: macos-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate Expo configuration
+        run: npx expo config --json > expo-config.json
+
+      - name: Generate native iOS project
+        run: npx expo prebuild --platform ios --non-interactive
+
+      - name: Install CocoaPods dependencies
+        run: npx pod-install ios
+
+      - name: Build unsigned iOS app
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/DerivedData build/Payload artifacts
+          workspace="$(find ios -maxdepth 1 -name '*.xcworkspace' -print -quit)"
+          if [[ -z "$workspace" ]]; then
+            echo "Nenhum workspace Xcode foi encontrado em ios/."
+            exit 1
+          fi
+          scheme="$(basename "$workspace" .xcworkspace)"
+          echo "Workspace: $workspace"
+          echo "Scheme: $scheme"
+          xcodebuild \
+            -workspace "$workspace" \
+            -scheme "$scheme" \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build
+          app_path="$(find build/DerivedData/Build/Products -maxdepth 2 -type d -name '*.app' -print -quit)"
+          if [[ -z "$app_path" ]]; then
+            echo "O build terminou sem produzir um arquivo .app."
+            exit 1
+          fi
+          cp -R "$app_path" build/Payload/
+          cd build
+          /usr/bin/zip -qry ../artifacts/codepilot-sidestore.ipa Payload
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codepilot-sidestore-ipa
+          path: artifacts/codepilot-sidestore.ipa
+          if-no-files-found: error
+          retention-days: 7

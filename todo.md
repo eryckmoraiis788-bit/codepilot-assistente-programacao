@@ -11,3 +11,12 @@
 - [x] Ajustar acessibilidade e comportamentos nativos de iOS
 - [x] Gerar ícone próprio e aplicar a identidade do CodePilot
 - [x] Validar o projeto, registrar a versão e orientar a distribuição iOS
+- [ ] Definir permissões, consentimento e privacidade da conexão com GitHub
+- [ ] Implementar autenticação GitHub e armazenamento seguro da sessão
+- [ ] Permitir selecionar repositórios e arquivos para análise no CodePilot
+- [ ] Exigir confirmação explícita antes de qualquer alteração remota no GitHub
+- [ ] Criar testes para o fluxo de conexão e registrar a versão atualizada
+- [ ] Configurar autorização GitHub App com permissões de leitura e seleção de repositórios
+- [x] Analisar a configuração de compilação iOS do repositório GitHub iOS App
+- [x] Adaptar a configuração de compilação ao CodePilot e preparar um repositório privado dedicado
+- [ ] Validar a estrutura de distribuição iOS e orientar a geração da IPA
